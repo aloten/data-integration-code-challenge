@@ -1,11 +1,13 @@
 export enum Topic {
   PET = 'pet',
+  PRODUCT = 'product',
+  PRESCRIPTION = 'prescription',
 }
 
 export enum Species {
-  DOG = "dog",
-  CAT = "cat",
-  HORSE = "horse",
+  DOG = 'dog',
+  CAT = 'cat',
+  HORSE = 'horse',
 }
 
 export interface Message {

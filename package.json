@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "@types/cors": "^2.8.13",
-    "avsc": "^5.7.7",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "kafkajs": "^2.2.4"

@@ -9,11 +9,11 @@ export class Producer {
   async connect() {
     await this.producer.connect();
   }
-  
-  async send(topic: Topic, message: Message) {
+
+  async send(topic: Topic, message: any) {
     await this.producer.send({
       topic: topic,
-      messages: [{ value: "test message"}],
+      messages: [{ value: message }],
     });
   }
   async disconnect() {

@@ -11,6 +11,7 @@ import { DbUtility } from './data/DbUtility';
 import petRoutes from './routes/petRoutes';
 import productRoutes from './routes/productRoutes';
 import prescriptionRoutes from './routes/prescriptionRoutes';
+import { setupConsumerAndProducer, createTopic } from './kafka';
 
 const app = express();
 
@@ -34,19 +35,23 @@ app.listen(3001, () => {
   console.log('\n\nexpress server listening on port 3001...\n\n');
 });
 
+// Kafka setup
 const kafka = new Kafka({
   clientId: 'my-app',
   brokers: ['localhost:9092'],
 });
 
-(async () => {
-  const consumer: Consumer = new Consumer(kafka);
-  const producer: Producer = new Producer(kafka);
+const admin = kafka.admin();
 
-  await consumer.connect(Topic.PET);
-  await consumer.run();
-  await producer.connect();
-  await producer.send(Topic.PET, { value: 'new Pet: Po' });
-})();
+createTopic(Topic.PET);
+createTopic(Topic.PRODUCT)
+createTopic(Topic.PRESCRIPTION);
 
+const consumer: Consumer = new Consumer(kafka);
+const producer: Producer = new Producer(kafka);
+
+setupConsumerAndProducer(consumer, producer);
+
+export { producer };
+export { admin };
 export { dbUtility };
