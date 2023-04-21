@@ -37,14 +37,14 @@ app.listen(3001, () => {
 
 // Kafka setup
 const kafka = new Kafka({
-  clientId: 'my-app',
+  clientId: "aidan's-app",
   brokers: ['localhost:9092'],
 });
 
 const admin = kafka.admin();
 
 createTopic(Topic.PET);
-createTopic(Topic.PRODUCT)
+createTopic(Topic.PRODUCT);
 createTopic(Topic.PRESCRIPTION);
 
 const consumer: Consumer = new Consumer(kafka);

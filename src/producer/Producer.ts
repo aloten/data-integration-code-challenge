@@ -10,7 +10,7 @@ export class Producer {
     await this.producer.connect();
   }
 
-  async send(topic: Topic, message: any) {
+  async send(topic: Topic, message: {}) {
     await this.producer.send({
       topic: topic,
       messages: [{ value: message }],

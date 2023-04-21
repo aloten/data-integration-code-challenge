@@ -28,25 +28,25 @@ export class Consumer {
           partition,
           value: message.value.toString(),
         });
-        // const json = JSON.parse(message.value.toString());
-        // if (topic === Topic.PET) this.consumePetTopic(json);
-        // if (topic === Topic.PRODUCT) this.consumeProductTopic(json);
-        // if (topic === Topic.PRESCRIPTION) this.consumePrescriptionTopic(json);
+        const json = JSON.parse(message.value.toString());
+        if (topic === Topic.PET) this.consumePetTopic(json);
+        if (topic === Topic.PRODUCT) this.consumeProductTopic(json);
+        if (topic === Topic.PRESCRIPTION) this.consumePrescriptionTopic(json);
       },
     });
   }
 
-  consumePetTopic(message: { name: string; species: string }) {
-    dbUtility.createPet(new Pet(message.name, message.species as Species));
+  consumePetTopic(petObject: { name: string; species: string }) {
+    dbUtility.createPet(new Pet(petObject.name, petObject.species as Species));
   }
 
-  consumeProductTopic(message: { name: string }) {
-    dbUtility.createProduct(new Product(message.name));
+  consumeProductTopic(productObject: { name: string }) {
+    dbUtility.createProduct(new Product(productObject.name));
   }
 
-  consumePrescriptionTopic(message: { petId: string; productId: string }) {
-    const productId = parseInt(message.productId);
-    const petId = parseInt(message.petId);
+  consumePrescriptionTopic(prescriptionObject: { petId: string; productId: string }) {
+    const productId = parseInt(prescriptionObject.productId);
+    const petId = parseInt(prescriptionObject.petId);
     const pet: Pet | null = dbUtility.getPet(petId);
     const product: Product | null = dbUtility.getProduct(productId);
     if (!pet || !product) {

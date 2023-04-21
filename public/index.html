@@ -183,7 +183,12 @@
         method: 'POST',
         body: JSON.stringify({ name, species }),
         headers: { 'Content-Type': 'application/json' },
-      }).then(() => updatePetTable());
+      }).then(() =>
+        setTimeout(() => {
+          updatePetTable();
+          updatePrescriptionSelectOptions();
+        }, 200)
+      );
     });
 
     // Product onsubmit
@@ -195,7 +200,10 @@
         body: JSON.stringify({ name }),
         headers: { 'Content-Type': 'application/json' },
       }).then(() => {
-        updateProductTable();
+        setTimeout(() => {
+          updateProductTable();
+          updatePrescriptionSelectOptions();
+        }, 200);
       });
     });
 
@@ -208,7 +216,11 @@
         method: 'POST',
         body: JSON.stringify({ petId, productId }),
         headers: { 'Content-Type': 'application/json' },
-      }).then(() => updatePrescriptionTable());
+      }).then(() =>
+        setTimeout(() => {
+          updatePrescriptionTable();
+        }, 200)
+      );
     });
 
     // define functions to update each table with data from the server
@@ -216,7 +228,6 @@
       fetch(HOSTNAME + '/pets')
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
           petTableBody.innerHTML = '';
           data.forEach((pet) => {
             const petRow = document.createElement('tr');
@@ -225,7 +236,6 @@
           <td>${pet._species}</td>
         `;
             petTableBody.appendChild(petRow);
-            updatePrescriptionSelectOptions('pet', pet._id, pet._name);
           });
         });
     }
@@ -241,11 +251,6 @@
           <td>${product._name}</td>
         `;
             productTableBody.appendChild(productRow);
-            updatePrescriptionSelectOptions(
-              'product',
-              product._id,
-              product._name
-            );
           });
         });
     }
@@ -258,8 +263,8 @@
           data.forEach((prescription) => {
             const prescriptionRow = document.createElement('tr');
             prescriptionRow.innerHTML = `
-          <td>${prescription._pet}</td>
-          <td>${prescription._product}</td>
+          <td>${prescription._pet._name}</td>
+          <td>${prescription._product._name}</td>
         `;
             prescriptionTableBody.appendChild(prescriptionRow);
           });
@@ -267,14 +272,38 @@
     }
 
     // update the prescription form options with a product or pet
-    function updatePrescriptionSelectOptions(endpoint, id, name) {
-      const select = document.querySelector(`#${endpoint}`);
+    function updatePrescriptionSelectOptions() {
+      console.log('update pre select options');
+      const selectPet = document.querySelector(`#pet`);
+      selectPet.innerHTML = '';
+      const selectProduct = document.querySelector(`#product`);
+      selectProduct.innerHTML = '';
 
-      const option = document.createElement('option');
-      option.value = id;
-      option.textContent = name;
+      fetch(HOSTNAME + '/pets')
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          data.forEach((pet) => {
+            console.log(pet);
+            const optionPet = document.createElement('option');
+            optionPet.value = pet._id;
+            optionPet.textContent = pet._name;
+            selectPet.appendChild(optionPet);
+          });
+        });
 
-      select.appendChild(option);
+      fetch(HOSTNAME + '/products')
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          data.forEach((product) => {
+            console.log(product);
+            const optionProduct = document.createElement('option');
+            optionProduct.value = product._id;
+            optionProduct.textContent = product._name;
+            selectProduct.appendChild(optionProduct);
+          });
+        });
     }
   </script>
 </html>

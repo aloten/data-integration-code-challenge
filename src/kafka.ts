@@ -20,23 +20,26 @@ export async function createTopic(topic: Topic) {
   await admin.connect();
 
   console.log('topics: ' + (await admin.listTopics()));
-  const topicExists = await admin
-    .listTopics()
-    .then((topics) => topics.includes(topic));
-  if (topicExists) {
-    console.log(`Topic "${topic}" already exists`);
-  } else {
-    await admin.createTopics({
-      topics: [
-        {
-          topic: topic,
-          numPartitions: 1,
-          replicationFactor: 1,
-        },
-      ],
-    });
-
+  try {
+    const topicExists = await admin
+      .listTopics()
+      .then((topics) => topics.includes(topic));
+    if (topicExists) {
+      console.log(`Topic "${topic}" already exists`);
+    } else {
+      await admin.createTopics({
+        topics: [
+          {
+            topic: topic,
+            numPartitions: 1,
+            replicationFactor: 1,
+          },
+        ],
+      });
+    }
     console.log(`Topic "${topic}" created successfully`);
+  } catch (error) {
+    console.log('No topics created for admin.listTopics() to access');
   }
 
   await admin.disconnect();

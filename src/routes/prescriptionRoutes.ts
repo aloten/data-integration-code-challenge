@@ -3,7 +3,8 @@ import { Prescription } from '../data/models/prescription/Prescription';
 import { Product } from '../data/models/product/Product';
 import { dbUtility } from '../server';
 import express from 'express';
-
+import { producer } from '../server';
+import { Topic } from '../types';
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -28,16 +29,9 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
   console.log(req.body);
   try {
-    const productId = parseInt(req.body.productId);
-    const petId = parseInt(req.body.petId);
-    const pet: Pet | null = dbUtility.getPet(petId);
-    const product: Product | null = dbUtility.getProduct(productId);
-    if (!pet || !product) {
-      throw new Error(
-        'product or pet is null when trying to create a prescription'
-      );
-    }
-    dbUtility.createPrescription(new Prescription(pet, product));
+    const productId = req.body.productId;
+    const petId = req.body.petId;
+    producer.send(Topic.PRESCRIPTION,JSON.stringify({productId, petId})); 
     res.status(201).send();
   } catch (error) {
     console.log(error);
