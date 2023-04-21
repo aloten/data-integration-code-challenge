@@ -25,4 +25,4 @@ yarn-error.log*
 
 database/*
 
-!database/
+!database/githubPlaceholder.txt
