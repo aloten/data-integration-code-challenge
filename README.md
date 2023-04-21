@@ -17,7 +17,7 @@ Express routes (all on same host=localhost and port=3001 '/pets', '/products', '
 2. The route handler for POST requests tells a kafka producer object to publish to the respective queue, where a consumer is listening and saves the data to the database using the single instance of DbUtility file, which saves and retrieves data.
 3. On the frontend, after the POST request is made, there is a 200ms timeout (to wait for the publication to and consumption of the kafka topic) before it initiates a GET request for relevant data to update the UI. For example, if you create a pet, after the POST request to '/pets', it requests GET '/pets' after 200ms to update the pet list and the create prescription form pet selection dropdown.
 
-## Startup and configuration
+## Run App
 1. run "npm install" in the project root dir to install all necessary packages in package.json
 2. run "docker-compose up" and wait for the containers to be created successfully and for the console to stop outputting logs to ensure the containers are ready
 3. in another terminal run "npm start" to run the app start process which compiles the TypeScript files and runs the resulting "dist/server.js" file
