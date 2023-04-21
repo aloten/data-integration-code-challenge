@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Rx Management Platform</title>
+    <style>
+      /* Reset styles */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Set background color */
+      body {
+        background-color: #f5f5f5;
+        font-family: sans-serif;
+        padding: 1rem;
+      }
+
+      .title {
+        text-align: center;
+      }
+
+      .main {
+        display: flex;
+        margin: 2rem;
+        gap: 2rem;
+      }
+
+      /* Set container styles */
+      .column {
+        flex-grow: 1;
+        max-width: 800px;
+        min-width: 300px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        margin-bottom: 1rem;
+      }
+
+      /* Set form styles */
+      form {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      input[type='text'],
+      select {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-bottom: 10px;
+      }
+
+      button[type='submit'] {
+        background-color: #4caf50;
+        color: #fff;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      /* Set table styles */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #4caf50;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="title">Pet Management Platform</h1>
+    <div class="main">
+      <div class="pets column">
+        <form>
+          <h2>Create a New Pet</h2>
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" required />
+
+          <label for="species">Species:</label>
+          <select id="species" name="species" required>
+            <option value="dog">Dog</option>
+            <option value="cat">Cat</option>
+          </select>
+
+          <button type="submit">Create</button>
+        </form>
+
+        <h2>List of Pets</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Species</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="products column">
+        <form>
+          <h2>Create a New Product</h2>
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" required />
+
+          <button type="submit">Create</button>
+        </form>
+
+        <h2>List of Products</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="prescriptions column">
+        <form>
+          <h2>Create a New Prescription</h2>
+          <label for="pet">Pet:</label>
+          <select id="pet" name="pet" required></select>
+          <label for="product">Product:</label>
+          <select id="product" name="product" required></select>
+
+          <button type="submit">Create</button>
+        </form>
+
+        <h2>List of Prescriptions</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Pet</th>
+              <th>Product</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+  <script>
+    const HOSTNAME = 'http://localhost:3001';
+    // define variables for each form and table
+    const petForm = document.querySelector('.pets form');
+    const petTableBody = document.querySelector('.pets tbody');
+    const productForm = document.querySelector('.products form');
+    const productTableBody = document.querySelector('.products tbody');
+    const prescriptionForm = document.querySelector('.prescriptions form');
+    const prescriptionTableBody = document.querySelector(
+      '.prescriptions tbody'
+    );
+
+    // Pet onsubmit create form
+    petForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const name = petForm.querySelector('#name').value;
+      const species = petForm.querySelector('#species').value;
+      fetch(HOSTNAME + '/pets', {
+        method: 'POST',
+        body: JSON.stringify({ name, species }),
+        headers: { 'Content-Type': 'application/json' },
+      }).then(() => updatePetTable());
+    });
+
+    // Product onsubmit
+    productForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const name = productForm.querySelector('#name').value;
+      fetch(HOSTNAME + '/products', {
+        method: 'POST',
+        body: JSON.stringify({ name }),
+        headers: { 'Content-Type': 'application/json' },
+      }).then(() => {
+        updateProductTable();
+      });
+    });
+
+    // Prescription onsubmit
+    prescriptionForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const petId = prescriptionForm.querySelector('#pet').value;
+      const productId = prescriptionForm.querySelector('#product').value;
+      fetch(HOSTNAME + '/prescriptions', {
+        method: 'POST',
+        body: JSON.stringify({ petId, productId }),
+        headers: { 'Content-Type': 'application/json' },
+      }).then(() => updatePrescriptionTable());
+    });
+
+    // define functions to update each table with data from the server
+    function updatePetTable() {
+      fetch(HOSTNAME + '/pets')
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          petTableBody.innerHTML = '';
+          data.forEach((pet) => {
+            const petRow = document.createElement('tr');
+            petRow.innerHTML = `
+          <td>${pet._name}</td>
+          <td>${pet._species}</td>
+        `;
+            petTableBody.appendChild(petRow);
+            updatePrescriptionSelectOptions('pet', pet._id, pet._name);
+          });
+        });
+    }
+
+    function updateProductTable() {
+      fetch(HOSTNAME + '/products')
+        .then((response) => response.json())
+        .then((data) => {
+          productTableBody.innerHTML = '';
+          data.forEach((product) => {
+            const productRow = document.createElement('tr');
+            productRow.innerHTML = `
+          <td>${product._name}</td>
+        `;
+            productTableBody.appendChild(productRow);
+            updatePrescriptionSelectOptions(
+              'product',
+              product._id,
+              product._name
+            );
+          });
+        });
+    }
+
+    function updatePrescriptionTable() {
+      fetch(HOSTNAME + '/prescriptions')
+        .then((response) => response.json())
+        .then((data) => {
+          prescriptionTableBody.innerHTML = '';
+          data.forEach((prescription) => {
+            const prescriptionRow = document.createElement('tr');
+            prescriptionRow.innerHTML = `
+          <td>${prescription._pet}</td>
+          <td>${prescription._product}</td>
+        `;
+            prescriptionTableBody.appendChild(prescriptionRow);
+          });
+        });
+    }
+
+    // update the prescription form options with a product or pet
+    function updatePrescriptionSelectOptions(endpoint, id, name) {
+      const select = document.querySelector(`#${endpoint}`);
+
+      const option = document.createElement('option');
+      option.value = id;
+      option.textContent = name;
+
+      select.appendChild(option);
+    }
+  </script>
+</html>
